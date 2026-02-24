@@ -9,8 +9,8 @@ use crate::syntax::parse_error::{
 };
 use crate::syntax::property::parse_generic_component_value;
 use crate::syntax::scss::{
-    is_at_scss_qualified_name, is_nth_at_scss_qualified_name, parse_scss_expression,
-    parse_scss_function_name,
+    SCSS_UNARY_OPERATOR_TOKEN_SET, is_at_scss_qualified_name, is_nth_at_scss_qualified_name,
+    parse_scss_expression, parse_scss_function_name,
 };
 use crate::syntax::value::attr::{is_at_attr_function, parse_attr_function};
 use crate::syntax::value::r#if::parse_if_function;
@@ -232,7 +232,13 @@ pub(crate) fn parse_any_expression(p: &mut CssParser) -> ParsedSyntax {
         return Absent;
     }
 
-    let param = parse_unary_expression_operand(p);
+    let param = if CssSyntaxFeatures::Scss.is_supported(p)
+        && (is_at_parenthesized(p) || is_at_any_value(p) || p.at_ts(SCSS_UNARY_OPERATOR_TOKEN_SET))
+    {
+        return parse_scss_expression(p);
+    } else {
+        parse_unary_expression_operand(p)
+    };
 
     if is_at_binary_operator(p) {
         let binary_expression = param.precede(p);
@@ -279,14 +285,9 @@ pub(crate) fn parse_unary_expression(p: &mut CssParser) -> ParsedSyntax {
 
 #[inline]
 fn parse_unary_expression_operand(p: &mut CssParser) -> ParsedSyntax {
-    let scss_enabled = CssSyntaxFeatures::Scss.is_supported(p);
-
     if is_at_unary_operator(p) {
         parse_unary_expression(p)
-    } else if scss_enabled && (is_at_parenthesized(p) || is_at_any_value(p)) {
-        parse_scss_expression(p)
-    } else if !scss_enabled && is_at_parenthesized(p) {
-        // In SCSS mode, parenthesized values are consumed as SCSS expressions above.
+    } else if is_at_parenthesized(p) {
         parse_parenthesized_expression(p)
     } else if is_at_comma_separated_value(p) {
         parse_comma_separated_value(p)
