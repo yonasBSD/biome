@@ -8808,6 +8808,41 @@ pub struct ScssDeclarationFields {
     pub semicolon_token: Option<SyntaxToken>,
 }
 #[derive(Clone, PartialEq, Eq, Hash)]
+pub struct ScssExpression {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ScssExpression {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub const unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self { syntax }
+    }
+    pub fn as_fields(&self) -> ScssExpressionFields {
+        ScssExpressionFields {
+            items: self.items(),
+        }
+    }
+    pub fn items(&self) -> ScssExpressionItemList {
+        support::list(&self.syntax, 0usize)
+    }
+}
+impl Serialize for ScssExpression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.as_fields().serialize(serializer)
+    }
+}
+#[derive(Serialize)]
+pub struct ScssExpressionFields {
+    pub items: ScssExpressionItemList,
+}
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct ScssIdentifier {
     pub(crate) syntax: SyntaxNode,
 }
@@ -8846,6 +8881,166 @@ impl Serialize for ScssIdentifier {
 pub struct ScssIdentifierFields {
     pub dollar_token: SyntaxResult<SyntaxToken>,
     pub name: SyntaxResult<CssIdentifier>,
+}
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct ScssListExpression {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ScssListExpression {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub const unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self { syntax }
+    }
+    pub fn as_fields(&self) -> ScssListExpressionFields {
+        ScssListExpressionFields {
+            elements: self.elements(),
+        }
+    }
+    pub fn elements(&self) -> ScssListExpressionElementList {
+        support::list(&self.syntax, 0usize)
+    }
+}
+impl Serialize for ScssListExpression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.as_fields().serialize(serializer)
+    }
+}
+#[derive(Serialize)]
+pub struct ScssListExpressionFields {
+    pub elements: ScssListExpressionElementList,
+}
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct ScssListExpressionElement {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ScssListExpressionElement {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub const unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self { syntax }
+    }
+    pub fn as_fields(&self) -> ScssListExpressionElementFields {
+        ScssListExpressionElementFields {
+            value: self.value(),
+        }
+    }
+    pub fn value(&self) -> SyntaxResult<AnyScssExpression> {
+        support::required_node(&self.syntax, 0usize)
+    }
+}
+impl Serialize for ScssListExpressionElement {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.as_fields().serialize(serializer)
+    }
+}
+#[derive(Serialize)]
+pub struct ScssListExpressionElementFields {
+    pub value: SyntaxResult<AnyScssExpression>,
+}
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct ScssMapExpression {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ScssMapExpression {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub const unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self { syntax }
+    }
+    pub fn as_fields(&self) -> ScssMapExpressionFields {
+        ScssMapExpressionFields {
+            l_paren_token: self.l_paren_token(),
+            pairs: self.pairs(),
+            r_paren_token: self.r_paren_token(),
+        }
+    }
+    pub fn l_paren_token(&self) -> SyntaxResult<SyntaxToken> {
+        support::required_token(&self.syntax, 0usize)
+    }
+    pub fn pairs(&self) -> ScssMapExpressionPairList {
+        support::list(&self.syntax, 1usize)
+    }
+    pub fn r_paren_token(&self) -> SyntaxResult<SyntaxToken> {
+        support::required_token(&self.syntax, 2usize)
+    }
+}
+impl Serialize for ScssMapExpression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.as_fields().serialize(serializer)
+    }
+}
+#[derive(Serialize)]
+pub struct ScssMapExpressionFields {
+    pub l_paren_token: SyntaxResult<SyntaxToken>,
+    pub pairs: ScssMapExpressionPairList,
+    pub r_paren_token: SyntaxResult<SyntaxToken>,
+}
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct ScssMapExpressionPair {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ScssMapExpressionPair {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub const unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self { syntax }
+    }
+    pub fn as_fields(&self) -> ScssMapExpressionPairFields {
+        ScssMapExpressionPairFields {
+            key: self.key(),
+            colon_token: self.colon_token(),
+            value: self.value(),
+        }
+    }
+    pub fn key(&self) -> SyntaxResult<AnyScssExpression> {
+        support::required_node(&self.syntax, 0usize)
+    }
+    pub fn colon_token(&self) -> SyntaxResult<SyntaxToken> {
+        support::required_token(&self.syntax, 1usize)
+    }
+    pub fn value(&self) -> SyntaxResult<AnyScssExpression> {
+        support::required_node(&self.syntax, 2usize)
+    }
+}
+impl Serialize for ScssMapExpressionPair {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.as_fields().serialize(serializer)
+    }
+}
+#[derive(Serialize)]
+pub struct ScssMapExpressionPairFields {
+    pub key: SyntaxResult<AnyScssExpression>,
+    pub colon_token: SyntaxResult<SyntaxToken>,
+    pub value: SyntaxResult<AnyScssExpression>,
 }
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct ScssNamespacedIdentifier {
@@ -8976,6 +9171,51 @@ impl Serialize for ScssParentSelectorValue {
 #[derive(Serialize)]
 pub struct ScssParentSelectorValueFields {
     pub amp_token: SyntaxResult<SyntaxToken>,
+}
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub struct ScssParenthesizedExpression {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ScssParenthesizedExpression {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub const unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self { syntax }
+    }
+    pub fn as_fields(&self) -> ScssParenthesizedExpressionFields {
+        ScssParenthesizedExpressionFields {
+            l_paren_token: self.l_paren_token(),
+            expression: self.expression(),
+            r_paren_token: self.r_paren_token(),
+        }
+    }
+    pub fn l_paren_token(&self) -> SyntaxResult<SyntaxToken> {
+        support::required_token(&self.syntax, 0usize)
+    }
+    pub fn expression(&self) -> SyntaxResult<AnyScssExpression> {
+        support::required_node(&self.syntax, 1usize)
+    }
+    pub fn r_paren_token(&self) -> SyntaxResult<SyntaxToken> {
+        support::required_token(&self.syntax, 2usize)
+    }
+}
+impl Serialize for ScssParenthesizedExpression {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.as_fields().serialize(serializer)
+    }
+}
+#[derive(Serialize)]
+pub struct ScssParenthesizedExpressionFields {
+    pub l_paren_token: SyntaxResult<SyntaxToken>,
+    pub expression: SyntaxResult<AnyScssExpression>,
+    pub r_paren_token: SyntaxResult<SyntaxToken>,
 }
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct ScssQualifiedName {
@@ -10731,6 +10971,7 @@ pub enum AnyCssExpression {
     CssListOfComponentValuesExpression(CssListOfComponentValuesExpression),
     CssParenthesizedExpression(CssParenthesizedExpression),
     CssUnaryExpression(CssUnaryExpression),
+    ScssExpression(ScssExpression),
 }
 impl AnyCssExpression {
     pub fn as_css_binary_expression(&self) -> Option<&CssBinaryExpression> {
@@ -10762,6 +11003,12 @@ impl AnyCssExpression {
     pub fn as_css_unary_expression(&self) -> Option<&CssUnaryExpression> {
         match &self {
             Self::CssUnaryExpression(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_expression(&self) -> Option<&ScssExpression> {
+        match &self {
+            Self::ScssExpression(item) => Some(item),
             _ => None,
         }
     }
@@ -12751,6 +12998,86 @@ impl AnyScssDeclarationName {
     pub fn as_scss_namespaced_identifier(&self) -> Option<&ScssNamespacedIdentifier> {
         match &self {
             Self::ScssNamespacedIdentifier(item) => Some(item),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, PartialEq, Eq, Hash, Serialize)]
+pub enum AnyScssExpression {
+    AnyCssValue(AnyCssValue),
+    ScssExpression(ScssExpression),
+    ScssListExpression(ScssListExpression),
+    ScssMapExpression(ScssMapExpression),
+    ScssParenthesizedExpression(ScssParenthesizedExpression),
+}
+impl AnyScssExpression {
+    pub fn as_any_css_value(&self) -> Option<&AnyCssValue> {
+        match &self {
+            Self::AnyCssValue(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_expression(&self) -> Option<&ScssExpression> {
+        match &self {
+            Self::ScssExpression(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_list_expression(&self) -> Option<&ScssListExpression> {
+        match &self {
+            Self::ScssListExpression(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_map_expression(&self) -> Option<&ScssMapExpression> {
+        match &self {
+            Self::ScssMapExpression(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_parenthesized_expression(&self) -> Option<&ScssParenthesizedExpression> {
+        match &self {
+            Self::ScssParenthesizedExpression(item) => Some(item),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, PartialEq, Eq, Hash, Serialize)]
+pub enum AnyScssExpressionItem {
+    AnyCssValue(AnyCssValue),
+    CssGenericDelimiter(CssGenericDelimiter),
+    ScssListExpression(ScssListExpression),
+    ScssMapExpression(ScssMapExpression),
+    ScssParenthesizedExpression(ScssParenthesizedExpression),
+}
+impl AnyScssExpressionItem {
+    pub fn as_any_css_value(&self) -> Option<&AnyCssValue> {
+        match &self {
+            Self::AnyCssValue(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_css_generic_delimiter(&self) -> Option<&CssGenericDelimiter> {
+        match &self {
+            Self::CssGenericDelimiter(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_list_expression(&self) -> Option<&ScssListExpression> {
+        match &self {
+            Self::ScssListExpression(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_map_expression(&self) -> Option<&ScssMapExpression> {
+        match &self {
+            Self::ScssMapExpression(item) => Some(item),
+            _ => None,
+        }
+    }
+    pub fn as_scss_parenthesized_expression(&self) -> Option<&ScssParenthesizedExpression> {
+        match &self {
+            Self::ScssParenthesizedExpression(item) => Some(item),
             _ => None,
         }
     }
@@ -23540,6 +23867,53 @@ impl From<ScssDeclaration> for SyntaxElement {
         n.syntax.into()
     }
 }
+impl AstNode for ScssExpression {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_EXPRESSION as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_EXPRESSION
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax
+    }
+}
+impl std::fmt::Debug for ScssExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        thread_local! { static DEPTH : std :: cell :: Cell < u8 > = const { std :: cell :: Cell :: new (0) } };
+        let current_depth = DEPTH.get();
+        let result = if current_depth < 16 {
+            DEPTH.set(current_depth + 1);
+            f.debug_struct("ScssExpression")
+                .field("items", &self.items())
+                .finish()
+        } else {
+            f.debug_struct("ScssExpression").finish()
+        };
+        DEPTH.set(current_depth);
+        result
+    }
+}
+impl From<ScssExpression> for SyntaxNode {
+    fn from(n: ScssExpression) -> Self {
+        n.syntax
+    }
+}
+impl From<ScssExpression> for SyntaxElement {
+    fn from(n: ScssExpression) -> Self {
+        n.syntax.into()
+    }
+}
 impl AstNode for ScssIdentifier {
     type Language = Language;
     const KIND_SET: SyntaxKindSet<Language> =
@@ -23588,6 +23962,207 @@ impl From<ScssIdentifier> for SyntaxNode {
 }
 impl From<ScssIdentifier> for SyntaxElement {
     fn from(n: ScssIdentifier) -> Self {
+        n.syntax.into()
+    }
+}
+impl AstNode for ScssListExpression {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_LIST_EXPRESSION as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_LIST_EXPRESSION
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax
+    }
+}
+impl std::fmt::Debug for ScssListExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        thread_local! { static DEPTH : std :: cell :: Cell < u8 > = const { std :: cell :: Cell :: new (0) } };
+        let current_depth = DEPTH.get();
+        let result = if current_depth < 16 {
+            DEPTH.set(current_depth + 1);
+            f.debug_struct("ScssListExpression")
+                .field("elements", &self.elements())
+                .finish()
+        } else {
+            f.debug_struct("ScssListExpression").finish()
+        };
+        DEPTH.set(current_depth);
+        result
+    }
+}
+impl From<ScssListExpression> for SyntaxNode {
+    fn from(n: ScssListExpression) -> Self {
+        n.syntax
+    }
+}
+impl From<ScssListExpression> for SyntaxElement {
+    fn from(n: ScssListExpression) -> Self {
+        n.syntax.into()
+    }
+}
+impl AstNode for ScssListExpressionElement {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_LIST_EXPRESSION_ELEMENT as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_LIST_EXPRESSION_ELEMENT
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax
+    }
+}
+impl std::fmt::Debug for ScssListExpressionElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        thread_local! { static DEPTH : std :: cell :: Cell < u8 > = const { std :: cell :: Cell :: new (0) } };
+        let current_depth = DEPTH.get();
+        let result = if current_depth < 16 {
+            DEPTH.set(current_depth + 1);
+            f.debug_struct("ScssListExpressionElement")
+                .field("value", &support::DebugSyntaxResult(self.value()))
+                .finish()
+        } else {
+            f.debug_struct("ScssListExpressionElement").finish()
+        };
+        DEPTH.set(current_depth);
+        result
+    }
+}
+impl From<ScssListExpressionElement> for SyntaxNode {
+    fn from(n: ScssListExpressionElement) -> Self {
+        n.syntax
+    }
+}
+impl From<ScssListExpressionElement> for SyntaxElement {
+    fn from(n: ScssListExpressionElement) -> Self {
+        n.syntax.into()
+    }
+}
+impl AstNode for ScssMapExpression {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_MAP_EXPRESSION as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_MAP_EXPRESSION
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax
+    }
+}
+impl std::fmt::Debug for ScssMapExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        thread_local! { static DEPTH : std :: cell :: Cell < u8 > = const { std :: cell :: Cell :: new (0) } };
+        let current_depth = DEPTH.get();
+        let result = if current_depth < 16 {
+            DEPTH.set(current_depth + 1);
+            f.debug_struct("ScssMapExpression")
+                .field(
+                    "l_paren_token",
+                    &support::DebugSyntaxResult(self.l_paren_token()),
+                )
+                .field("pairs", &self.pairs())
+                .field(
+                    "r_paren_token",
+                    &support::DebugSyntaxResult(self.r_paren_token()),
+                )
+                .finish()
+        } else {
+            f.debug_struct("ScssMapExpression").finish()
+        };
+        DEPTH.set(current_depth);
+        result
+    }
+}
+impl From<ScssMapExpression> for SyntaxNode {
+    fn from(n: ScssMapExpression) -> Self {
+        n.syntax
+    }
+}
+impl From<ScssMapExpression> for SyntaxElement {
+    fn from(n: ScssMapExpression) -> Self {
+        n.syntax.into()
+    }
+}
+impl AstNode for ScssMapExpressionPair {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_MAP_EXPRESSION_PAIR as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_MAP_EXPRESSION_PAIR
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax
+    }
+}
+impl std::fmt::Debug for ScssMapExpressionPair {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        thread_local! { static DEPTH : std :: cell :: Cell < u8 > = const { std :: cell :: Cell :: new (0) } };
+        let current_depth = DEPTH.get();
+        let result = if current_depth < 16 {
+            DEPTH.set(current_depth + 1);
+            f.debug_struct("ScssMapExpressionPair")
+                .field("key", &support::DebugSyntaxResult(self.key()))
+                .field(
+                    "colon_token",
+                    &support::DebugSyntaxResult(self.colon_token()),
+                )
+                .field("value", &support::DebugSyntaxResult(self.value()))
+                .finish()
+        } else {
+            f.debug_struct("ScssMapExpressionPair").finish()
+        };
+        DEPTH.set(current_depth);
+        result
+    }
+}
+impl From<ScssMapExpressionPair> for SyntaxNode {
+    fn from(n: ScssMapExpressionPair) -> Self {
+        n.syntax
+    }
+}
+impl From<ScssMapExpressionPair> for SyntaxElement {
+    fn from(n: ScssMapExpressionPair) -> Self {
         n.syntax.into()
     }
 }
@@ -23737,6 +24312,61 @@ impl From<ScssParentSelectorValue> for SyntaxNode {
 }
 impl From<ScssParentSelectorValue> for SyntaxElement {
     fn from(n: ScssParentSelectorValue) -> Self {
+        n.syntax.into()
+    }
+}
+impl AstNode for ScssParenthesizedExpression {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_PARENTHESIZED_EXPRESSION as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_PARENTHESIZED_EXPRESSION
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax
+    }
+}
+impl std::fmt::Debug for ScssParenthesizedExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        thread_local! { static DEPTH : std :: cell :: Cell < u8 > = const { std :: cell :: Cell :: new (0) } };
+        let current_depth = DEPTH.get();
+        let result = if current_depth < 16 {
+            DEPTH.set(current_depth + 1);
+            f.debug_struct("ScssParenthesizedExpression")
+                .field(
+                    "l_paren_token",
+                    &support::DebugSyntaxResult(self.l_paren_token()),
+                )
+                .field("expression", &support::DebugSyntaxResult(self.expression()))
+                .field(
+                    "r_paren_token",
+                    &support::DebugSyntaxResult(self.r_paren_token()),
+                )
+                .finish()
+        } else {
+            f.debug_struct("ScssParenthesizedExpression").finish()
+        };
+        DEPTH.set(current_depth);
+        result
+    }
+}
+impl From<ScssParenthesizedExpression> for SyntaxNode {
+    fn from(n: ScssParenthesizedExpression) -> Self {
+        n.syntax
+    }
+}
+impl From<ScssParenthesizedExpression> for SyntaxElement {
+    fn from(n: ScssParenthesizedExpression) -> Self {
         n.syntax.into()
     }
 }
@@ -27278,13 +27908,19 @@ impl From<CssUnaryExpression> for AnyCssExpression {
         Self::CssUnaryExpression(node)
     }
 }
+impl From<ScssExpression> for AnyCssExpression {
+    fn from(node: ScssExpression) -> Self {
+        Self::ScssExpression(node)
+    }
+}
 impl AstNode for AnyCssExpression {
     type Language = Language;
     const KIND_SET: SyntaxKindSet<Language> = CssBinaryExpression::KIND_SET
         .union(CssCommaSeparatedValue::KIND_SET)
         .union(CssListOfComponentValuesExpression::KIND_SET)
         .union(CssParenthesizedExpression::KIND_SET)
-        .union(CssUnaryExpression::KIND_SET);
+        .union(CssUnaryExpression::KIND_SET)
+        .union(ScssExpression::KIND_SET);
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
@@ -27293,6 +27929,7 @@ impl AstNode for AnyCssExpression {
                 | CSS_LIST_OF_COMPONENT_VALUES_EXPRESSION
                 | CSS_PARENTHESIZED_EXPRESSION
                 | CSS_UNARY_EXPRESSION
+                | SCSS_EXPRESSION
         )
     }
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -27310,6 +27947,7 @@ impl AstNode for AnyCssExpression {
                 Self::CssParenthesizedExpression(CssParenthesizedExpression { syntax })
             }
             CSS_UNARY_EXPRESSION => Self::CssUnaryExpression(CssUnaryExpression { syntax }),
+            SCSS_EXPRESSION => Self::ScssExpression(ScssExpression { syntax }),
             _ => return None,
         };
         Some(res)
@@ -27321,6 +27959,7 @@ impl AstNode for AnyCssExpression {
             Self::CssListOfComponentValuesExpression(it) => it.syntax(),
             Self::CssParenthesizedExpression(it) => it.syntax(),
             Self::CssUnaryExpression(it) => it.syntax(),
+            Self::ScssExpression(it) => it.syntax(),
         }
     }
     fn into_syntax(self) -> SyntaxNode {
@@ -27330,6 +27969,7 @@ impl AstNode for AnyCssExpression {
             Self::CssListOfComponentValuesExpression(it) => it.into_syntax(),
             Self::CssParenthesizedExpression(it) => it.into_syntax(),
             Self::CssUnaryExpression(it) => it.into_syntax(),
+            Self::ScssExpression(it) => it.into_syntax(),
         }
     }
 }
@@ -27341,6 +27981,7 @@ impl std::fmt::Debug for AnyCssExpression {
             Self::CssListOfComponentValuesExpression(it) => std::fmt::Debug::fmt(it, f),
             Self::CssParenthesizedExpression(it) => std::fmt::Debug::fmt(it, f),
             Self::CssUnaryExpression(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssExpression(it) => std::fmt::Debug::fmt(it, f),
         }
     }
 }
@@ -27352,6 +27993,7 @@ impl From<AnyCssExpression> for SyntaxNode {
             AnyCssExpression::CssListOfComponentValuesExpression(it) => it.into_syntax(),
             AnyCssExpression::CssParenthesizedExpression(it) => it.into_syntax(),
             AnyCssExpression::CssUnaryExpression(it) => it.into_syntax(),
+            AnyCssExpression::ScssExpression(it) => it.into_syntax(),
         }
     }
 }
@@ -33073,6 +33715,208 @@ impl From<AnyScssDeclarationName> for SyntaxElement {
         node.into()
     }
 }
+impl From<ScssExpression> for AnyScssExpression {
+    fn from(node: ScssExpression) -> Self {
+        Self::ScssExpression(node)
+    }
+}
+impl From<ScssListExpression> for AnyScssExpression {
+    fn from(node: ScssListExpression) -> Self {
+        Self::ScssListExpression(node)
+    }
+}
+impl From<ScssMapExpression> for AnyScssExpression {
+    fn from(node: ScssMapExpression) -> Self {
+        Self::ScssMapExpression(node)
+    }
+}
+impl From<ScssParenthesizedExpression> for AnyScssExpression {
+    fn from(node: ScssParenthesizedExpression) -> Self {
+        Self::ScssParenthesizedExpression(node)
+    }
+}
+impl AstNode for AnyScssExpression {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> = AnyCssValue::KIND_SET
+        .union(ScssExpression::KIND_SET)
+        .union(ScssListExpression::KIND_SET)
+        .union(ScssMapExpression::KIND_SET)
+        .union(ScssParenthesizedExpression::KIND_SET);
+    fn can_cast(kind: SyntaxKind) -> bool {
+        match kind {
+            SCSS_EXPRESSION
+            | SCSS_LIST_EXPRESSION
+            | SCSS_MAP_EXPRESSION
+            | SCSS_PARENTHESIZED_EXPRESSION => true,
+            k if AnyCssValue::can_cast(k) => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SCSS_EXPRESSION => Self::ScssExpression(ScssExpression { syntax }),
+            SCSS_LIST_EXPRESSION => Self::ScssListExpression(ScssListExpression { syntax }),
+            SCSS_MAP_EXPRESSION => Self::ScssMapExpression(ScssMapExpression { syntax }),
+            SCSS_PARENTHESIZED_EXPRESSION => {
+                Self::ScssParenthesizedExpression(ScssParenthesizedExpression { syntax })
+            }
+            _ => {
+                if let Some(any_css_value) = AnyCssValue::cast(syntax) {
+                    return Some(Self::AnyCssValue(any_css_value));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Self::ScssExpression(it) => it.syntax(),
+            Self::ScssListExpression(it) => it.syntax(),
+            Self::ScssMapExpression(it) => it.syntax(),
+            Self::ScssParenthesizedExpression(it) => it.syntax(),
+            Self::AnyCssValue(it) => it.syntax(),
+        }
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        match self {
+            Self::ScssExpression(it) => it.into_syntax(),
+            Self::ScssListExpression(it) => it.into_syntax(),
+            Self::ScssMapExpression(it) => it.into_syntax(),
+            Self::ScssParenthesizedExpression(it) => it.into_syntax(),
+            Self::AnyCssValue(it) => it.into_syntax(),
+        }
+    }
+}
+impl std::fmt::Debug for AnyScssExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::AnyCssValue(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssExpression(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssListExpression(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssMapExpression(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssParenthesizedExpression(it) => std::fmt::Debug::fmt(it, f),
+        }
+    }
+}
+impl From<AnyScssExpression> for SyntaxNode {
+    fn from(n: AnyScssExpression) -> Self {
+        match n {
+            AnyScssExpression::AnyCssValue(it) => it.into_syntax(),
+            AnyScssExpression::ScssExpression(it) => it.into_syntax(),
+            AnyScssExpression::ScssListExpression(it) => it.into_syntax(),
+            AnyScssExpression::ScssMapExpression(it) => it.into_syntax(),
+            AnyScssExpression::ScssParenthesizedExpression(it) => it.into_syntax(),
+        }
+    }
+}
+impl From<AnyScssExpression> for SyntaxElement {
+    fn from(n: AnyScssExpression) -> Self {
+        let node: SyntaxNode = n.into();
+        node.into()
+    }
+}
+impl From<CssGenericDelimiter> for AnyScssExpressionItem {
+    fn from(node: CssGenericDelimiter) -> Self {
+        Self::CssGenericDelimiter(node)
+    }
+}
+impl From<ScssListExpression> for AnyScssExpressionItem {
+    fn from(node: ScssListExpression) -> Self {
+        Self::ScssListExpression(node)
+    }
+}
+impl From<ScssMapExpression> for AnyScssExpressionItem {
+    fn from(node: ScssMapExpression) -> Self {
+        Self::ScssMapExpression(node)
+    }
+}
+impl From<ScssParenthesizedExpression> for AnyScssExpressionItem {
+    fn from(node: ScssParenthesizedExpression) -> Self {
+        Self::ScssParenthesizedExpression(node)
+    }
+}
+impl AstNode for AnyScssExpressionItem {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> = AnyCssValue::KIND_SET
+        .union(CssGenericDelimiter::KIND_SET)
+        .union(ScssListExpression::KIND_SET)
+        .union(ScssMapExpression::KIND_SET)
+        .union(ScssParenthesizedExpression::KIND_SET);
+    fn can_cast(kind: SyntaxKind) -> bool {
+        match kind {
+            CSS_GENERIC_DELIMITER
+            | SCSS_LIST_EXPRESSION
+            | SCSS_MAP_EXPRESSION
+            | SCSS_PARENTHESIZED_EXPRESSION => true,
+            k if AnyCssValue::can_cast(k) => true,
+            _ => false,
+        }
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            CSS_GENERIC_DELIMITER => Self::CssGenericDelimiter(CssGenericDelimiter { syntax }),
+            SCSS_LIST_EXPRESSION => Self::ScssListExpression(ScssListExpression { syntax }),
+            SCSS_MAP_EXPRESSION => Self::ScssMapExpression(ScssMapExpression { syntax }),
+            SCSS_PARENTHESIZED_EXPRESSION => {
+                Self::ScssParenthesizedExpression(ScssParenthesizedExpression { syntax })
+            }
+            _ => {
+                if let Some(any_css_value) = AnyCssValue::cast(syntax) {
+                    return Some(Self::AnyCssValue(any_css_value));
+                }
+                return None;
+            }
+        };
+        Some(res)
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Self::CssGenericDelimiter(it) => it.syntax(),
+            Self::ScssListExpression(it) => it.syntax(),
+            Self::ScssMapExpression(it) => it.syntax(),
+            Self::ScssParenthesizedExpression(it) => it.syntax(),
+            Self::AnyCssValue(it) => it.syntax(),
+        }
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        match self {
+            Self::CssGenericDelimiter(it) => it.into_syntax(),
+            Self::ScssListExpression(it) => it.into_syntax(),
+            Self::ScssMapExpression(it) => it.into_syntax(),
+            Self::ScssParenthesizedExpression(it) => it.into_syntax(),
+            Self::AnyCssValue(it) => it.into_syntax(),
+        }
+    }
+}
+impl std::fmt::Debug for AnyScssExpressionItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::AnyCssValue(it) => std::fmt::Debug::fmt(it, f),
+            Self::CssGenericDelimiter(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssListExpression(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssMapExpression(it) => std::fmt::Debug::fmt(it, f),
+            Self::ScssParenthesizedExpression(it) => std::fmt::Debug::fmt(it, f),
+        }
+    }
+}
+impl From<AnyScssExpressionItem> for SyntaxNode {
+    fn from(n: AnyScssExpressionItem) -> Self {
+        match n {
+            AnyScssExpressionItem::AnyCssValue(it) => it.into_syntax(),
+            AnyScssExpressionItem::CssGenericDelimiter(it) => it.into_syntax(),
+            AnyScssExpressionItem::ScssListExpression(it) => it.into_syntax(),
+            AnyScssExpressionItem::ScssMapExpression(it) => it.into_syntax(),
+            AnyScssExpressionItem::ScssParenthesizedExpression(it) => it.into_syntax(),
+        }
+    }
+}
+impl From<AnyScssExpressionItem> for SyntaxElement {
+    fn from(n: AnyScssExpressionItem) -> Self {
+        let node: SyntaxNode = n.into();
+        node.into()
+    }
+}
 impl From<CssIdentifier> for AnyScssModuleMember {
     fn from(node: CssIdentifier) -> Self {
         Self::CssIdentifier(node)
@@ -33890,6 +34734,16 @@ impl std::fmt::Display for AnyCssValueAtRuleProperty {
     }
 }
 impl std::fmt::Display for AnyScssDeclarationName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AnyScssExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AnyScssExpressionItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -34959,7 +35813,32 @@ impl std::fmt::Display for ScssDeclaration {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for ScssExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for ScssIdentifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ScssListExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ScssListExpressionElement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ScssMapExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ScssMapExpressionPair {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -34975,6 +35854,11 @@ impl std::fmt::Display for ScssNestingDeclaration {
     }
 }
 impl std::fmt::Display for ScssParentSelectorValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ScssParenthesizedExpression {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -40054,6 +40938,252 @@ impl IntoIterator for CssValueAtRulePropertyList {
 impl IntoIterator for &CssValueAtRulePropertyList {
     type Item = SyntaxResult<AnyCssValueAtRuleProperty>;
     type IntoIter = AstSeparatedListNodesIterator<Language, AnyCssValueAtRuleProperty>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+#[derive(Clone, Eq, PartialEq, Hash)]
+pub struct ScssExpressionItemList {
+    syntax_list: SyntaxList,
+}
+impl ScssExpressionItemList {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self {
+            syntax_list: syntax.into_list(),
+        }
+    }
+}
+impl AstNode for ScssExpressionItemList {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_EXPRESSION_ITEM_LIST as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_EXPRESSION_ITEM_LIST
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self {
+                syntax_list: syntax.into_list(),
+            })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        self.syntax_list.node()
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax_list.into_node()
+    }
+}
+impl Serialize for ScssExpressionItemList {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for e in self.iter() {
+            seq.serialize_element(&e)?;
+        }
+        seq.end()
+    }
+}
+impl AstNodeList for ScssExpressionItemList {
+    type Language = Language;
+    type Node = AnyScssExpressionItem;
+    fn syntax_list(&self) -> &SyntaxList {
+        &self.syntax_list
+    }
+    fn into_syntax_list(self) -> SyntaxList {
+        self.syntax_list
+    }
+}
+impl Debug for ScssExpressionItemList {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str("ScssExpressionItemList ")?;
+        f.debug_list().entries(self.iter()).finish()
+    }
+}
+impl IntoIterator for &ScssExpressionItemList {
+    type Item = AnyScssExpressionItem;
+    type IntoIter = AstNodeListIterator<Language, AnyScssExpressionItem>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+impl IntoIterator for ScssExpressionItemList {
+    type Item = AnyScssExpressionItem;
+    type IntoIter = AstNodeListIterator<Language, AnyScssExpressionItem>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+#[derive(Clone, Eq, PartialEq, Hash)]
+pub struct ScssListExpressionElementList {
+    syntax_list: SyntaxList,
+}
+impl ScssListExpressionElementList {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self {
+            syntax_list: syntax.into_list(),
+        }
+    }
+}
+impl AstNode for ScssListExpressionElementList {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_LIST_EXPRESSION_ELEMENT_LIST as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_LIST_EXPRESSION_ELEMENT_LIST
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self {
+                syntax_list: syntax.into_list(),
+            })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        self.syntax_list.node()
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax_list.into_node()
+    }
+}
+impl Serialize for ScssListExpressionElementList {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for e in self.iter() {
+            seq.serialize_element(&e)?;
+        }
+        seq.end()
+    }
+}
+impl AstSeparatedList for ScssListExpressionElementList {
+    type Language = Language;
+    type Node = ScssListExpressionElement;
+    fn syntax_list(&self) -> &SyntaxList {
+        &self.syntax_list
+    }
+    fn into_syntax_list(self) -> SyntaxList {
+        self.syntax_list
+    }
+}
+impl Debug for ScssListExpressionElementList {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str("ScssListExpressionElementList ")?;
+        f.debug_list().entries(self.elements()).finish()
+    }
+}
+impl IntoIterator for ScssListExpressionElementList {
+    type Item = SyntaxResult<ScssListExpressionElement>;
+    type IntoIter = AstSeparatedListNodesIterator<Language, ScssListExpressionElement>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+impl IntoIterator for &ScssListExpressionElementList {
+    type Item = SyntaxResult<ScssListExpressionElement>;
+    type IntoIter = AstSeparatedListNodesIterator<Language, ScssListExpressionElement>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+#[derive(Clone, Eq, PartialEq, Hash)]
+pub struct ScssMapExpressionPairList {
+    syntax_list: SyntaxList,
+}
+impl ScssMapExpressionPairList {
+    #[doc = r" Create an AstNode from a SyntaxNode without checking its kind"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r" This function must be guarded with a call to [AstNode::can_cast]"]
+    #[doc = r" or a match on [SyntaxNode::kind]"]
+    #[inline]
+    pub unsafe fn new_unchecked(syntax: SyntaxNode) -> Self {
+        Self {
+            syntax_list: syntax.into_list(),
+        }
+    }
+}
+impl AstNode for ScssMapExpressionPairList {
+    type Language = Language;
+    const KIND_SET: SyntaxKindSet<Language> =
+        SyntaxKindSet::from_raw(RawSyntaxKind(SCSS_MAP_EXPRESSION_PAIR_LIST as u16));
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SCSS_MAP_EXPRESSION_PAIR_LIST
+    }
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self {
+                syntax_list: syntax.into_list(),
+            })
+        } else {
+            None
+        }
+    }
+    fn syntax(&self) -> &SyntaxNode {
+        self.syntax_list.node()
+    }
+    fn into_syntax(self) -> SyntaxNode {
+        self.syntax_list.into_node()
+    }
+}
+impl Serialize for ScssMapExpressionPairList {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for e in self.iter() {
+            seq.serialize_element(&e)?;
+        }
+        seq.end()
+    }
+}
+impl AstSeparatedList for ScssMapExpressionPairList {
+    type Language = Language;
+    type Node = ScssMapExpressionPair;
+    fn syntax_list(&self) -> &SyntaxList {
+        &self.syntax_list
+    }
+    fn into_syntax_list(self) -> SyntaxList {
+        self.syntax_list
+    }
+}
+impl Debug for ScssMapExpressionPairList {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str("ScssMapExpressionPairList ")?;
+        f.debug_list().entries(self.elements()).finish()
+    }
+}
+impl IntoIterator for ScssMapExpressionPairList {
+    type Item = SyntaxResult<ScssMapExpressionPair>;
+    type IntoIter = AstSeparatedListNodesIterator<Language, ScssMapExpressionPair>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+impl IntoIterator for &ScssMapExpressionPairList {
+    type Item = SyntaxResult<ScssMapExpressionPair>;
+    type IntoIter = AstSeparatedListNodesIterator<Language, ScssMapExpressionPair>;
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
     }
