@@ -2405,6 +2405,11 @@ See https://biomejs.dev/linter/rules/use-lone-executable-definition
 	 */
 	useLoneExecutableDefinition?: UseLoneExecutableDefinitionConfiguration;
 	/**
+	* Enforce using named capture groups in regular expression.
+See https://biomejs.dev/linter/rules/use-named-capture-group 
+	 */
+	useNamedCaptureGroup?: UseNamedCaptureGroupConfiguration;
+	/**
 	* Enforce using nullish coalescing operator (??) instead of logical or (||).
 See https://biomejs.dev/linter/rules/use-nullish-coalescing 
 	 */
@@ -4261,6 +4266,9 @@ export type UseLoneAnonymousOperationConfiguration =
 export type UseLoneExecutableDefinitionConfiguration =
 	| RulePlainConfiguration
 	| RuleWithUseLoneExecutableDefinitionOptions;
+export type UseNamedCaptureGroupConfiguration =
+	| RulePlainConfiguration
+	| RuleWithUseNamedCaptureGroupOptions;
 export type UseNullishCoalescingConfiguration =
 	| RulePlainConfiguration
 	| RuleWithUseNullishCoalescingOptions;
@@ -5963,6 +5971,10 @@ export interface RuleWithUseLoneExecutableDefinitionOptions {
 	level: RulePlainConfiguration;
 	options?: UseLoneExecutableDefinitionOptions;
 }
+export interface RuleWithUseNamedCaptureGroupOptions {
+	level: RulePlainConfiguration;
+	options?: UseNamedCaptureGroupOptions;
+}
 export interface RuleWithUseNullishCoalescingOptions {
 	fix?: FixKind;
 	level: RulePlainConfiguration;
@@ -7406,6 +7418,7 @@ export interface UseInputNameOptions {
 }
 export type UseLoneAnonymousOperationOptions = {};
 export type UseLoneExecutableDefinitionOptions = {};
+export type UseNamedCaptureGroupOptions = {};
 export interface UseNullishCoalescingOptions {
 	/**
 	* Whether to ignore `||` expressions in conditional test positions
@@ -8390,7 +8403,11 @@ export type Category =
 	| "lint/nursery/useLoneAnonymousOperation"
 	| "lint/nursery/useLoneExecutableDefinition"
 	| "lint/nursery/useNullishCoalescing"
+	| "lint/nursery/useMaxParams"
+	| "lint/nursery/useNamedCaptureGroup"
 	| "lint/nursery/usePlaywrightValidDescribeCallback"
+	| "lint/nursery/useQwikMethodUsage"
+	| "lint/nursery/useQwikValidLexicalScope"
 	| "lint/nursery/useRegexpExec"
 	| "lint/nursery/useRequiredScripts"
 	| "lint/nursery/useSortedClasses"
