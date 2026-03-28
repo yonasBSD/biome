@@ -9404,17 +9404,34 @@ Maps from the local imported name to the absolute path it resolves to.
 export interface PullDiagnosticsParams {
 	categories: RuleCategories;
 	/**
+	* Minimum severity for a diagnostic to be included. Diagnostics with a
+severity below this threshold are ignored entirely (not counted, not
+serialized). Defaults to [`Severity::Hint`] (include everything). 
+	 */
+	diagnosticLevel?: Severity;
+	/**
 	 * Rules to apply on top of the configuration
 	 */
 	enabledRules?: AnalyzerSelector[];
+	/**
+	* When true, promote assist diagnostics (`assist/*`) to error severity
+before applying the diagnostic_level filter. 
+	 */
+	enforceAssist?: boolean;
+	/**
+	 * When `true`, diagnostics include code suggestions for rule fixes.
+	 */
+	includeCodeFix?: boolean;
 	inlineConfig?: Configuration;
+	/**
+	* Max limit of diagnostics types to pull. This limit is meant to cap the number of [Diagnostic] to pull.
+However, the workspace still processes ALL diagnostics coming from the analyzer to compute their severity.
+If no value is provided, the workspace will pull all diagnostics. 
+	 */
+	maxDiagnostics?: number;
 	only?: AnalyzerSelector[];
 	path: BiomePath;
 	projectKey: ProjectKey;
-	/**
-	 * When `false` the diagnostics, don't have code frames of the code actions (fixes, suppressions, etc.)
-	 */
-	pullCodeActions: boolean;
 	skip?: AnalyzerSelector[];
 }
 export type RuleCategories = RuleCategory[];
@@ -9423,10 +9440,22 @@ export type RuleCategory = "syntax" | "lint" | "action" | "transformation";
 export interface PullDiagnosticsResult {
 	diagnostics: Diagnostic[];
 	errors: number;
+	infos: number;
+	/**
+	* Number of parse errors (subset of `errors`). Used by `--skip-parse-errors`
+to distinguish parse errors from analyzer errors. 
+	 */
+	parseErrors: number;
 	skippedDiagnostics: number;
+	warnings: number;
 }
 export interface PullActionsParams {
 	categories?: RuleCategories;
+	/**
+	* When `false`, returned actions have `suggestion: None` (no `BatchMutation`
+computed). Used by `codeAction/resolve` to defer edit computation. 
+	 */
+	computeActions?: boolean;
 	enabledRules?: AnalyzerSelector[];
 	inlineConfig?: Configuration;
 	only?: AnalyzerSelector[];
@@ -9440,11 +9469,20 @@ export interface PullActionsResult {
 	actions: CodeAction[];
 }
 export interface CodeAction {
+	applicability?: Applicability;
 	category: ActionCategory;
 	offset?: TextSize;
 	ruleName?: [string, string];
-	suggestion: CodeSuggestion;
+	/**
+	* The computed code suggestion with text edit. `None` when the action was
+returned without computing edits (deferred for `codeAction/resolve`). 
+	 */
+	suggestion?: CodeSuggestion;
 }
+/**
+ * Indicates how a tool should manage this suggestion.
+ */
+export type Applicability = "always" | "maybeIncorrect";
 /**
 	* The category of a code action, this type maps directly to the
 [CodeActionKind] type in the Language Server Protocol specification
@@ -9491,10 +9529,6 @@ export type OtherActionCategory =
 	| "inlineSuppression"
 	| "toplevelSuppression"
 	| { generic: string };
-/**
- * Indicates how a tool should manage this suggestion.
- */
-export type Applicability = "always" | "maybeIncorrect";
 export interface PullDiagnosticsAndActionsParams {
 	categories?: RuleCategories;
 	enabledRules?: AnalyzerSelector[];

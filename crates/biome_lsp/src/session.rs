@@ -7,7 +7,7 @@ use biome_analyze::RuleCategoriesBuilder;
 use biome_configuration::{Configuration, ConfigurationPathHint};
 use biome_console::markup;
 use biome_deserialize::Merge;
-use biome_diagnostics::PrintDescription;
+use biome_diagnostics::{PrintDescription, Severity};
 use biome_fs::{BiomePath, normalize_path};
 use biome_line_index::WideEncoding;
 use biome_lsp_converters::{PositionEncoding, negotiated_encoding};
@@ -34,8 +34,7 @@ use camino::Utf8PathBuf;
 use futures::StreamExt;
 use futures::stream::futures_unordered::FuturesUnordered;
 use papaya::HashMap;
-use rustc_hash::FxBuildHasher;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
 use serde_json::Value;
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -392,7 +391,7 @@ impl Session {
         let Some(doc) = self.document(&url) else {
             return Ok(());
         };
-        self.update_diagnostics_for_document(url, doc).await
+        self.update_diagnostics_for_document(url.clone(), doc).await
     }
 
     /// Computes diagnostics for the file matching the provided url and publishes
@@ -436,7 +435,7 @@ impl Session {
 
         if !file_features.supports_lint() && !file_features.supports_assist() {
             self.client
-                .publish_diagnostics(url, vec![], Some(doc.version))
+                .publish_diagnostics(url.clone(), vec![], Some(doc.version))
                 .await;
             return Ok(());
         }
@@ -458,8 +457,11 @@ impl Session {
                 only: Vec::new(),
                 skip: Vec::new(),
                 enabled_rules: Vec::new(),
-                pull_code_actions: false,
+                include_code_fix: false,
                 inline_config: self.inline_config(),
+                max_diagnostics: None,
+                diagnostic_level: Severity::Information,
+                enforce_assist: false,
             })?;
 
             let offset = if file_features.supports_full_html_support() {
@@ -507,7 +509,7 @@ impl Session {
         info!("Diagnostics sent to the client {}", diagnostics.len());
 
         self.client
-            .publish_diagnostics(url, diagnostics, Some(doc.version))
+            .publish_diagnostics(url.clone(), diagnostics, Some(doc.version))
             .await;
 
         Ok(())
@@ -599,6 +601,20 @@ impl Session {
 
         info!("Can register didChangeWatchedFiles: {result}");
         result
+    }
+
+    /// Whether the client supports `codeAction/resolve` for deferred edit computation.
+    /// Whether the client supports `codeAction/resolve` for deferred edit computation.
+    ///
+    /// Per LSP spec, `resolveSupport.properties` lists which specific properties
+    /// the client can resolve. We only defer when `"edit"` is in that list.
+    pub(crate) fn supports_code_action_resolve(&self) -> bool {
+        self.initialize_params
+            .get()
+            .and_then(|c| c.client_capabilities.text_document.as_ref())
+            .and_then(|c| c.code_action.as_ref())
+            .and_then(|c| c.resolve_support.as_ref())
+            .is_some_and(|support| support.properties.iter().any(|p| p == "edit"))
     }
 
     #[instrument(level = "info", skip(self))]

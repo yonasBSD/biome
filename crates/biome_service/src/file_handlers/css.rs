@@ -16,7 +16,9 @@ use crate::workspace::{
     CodeAction, DocumentFileSource, FixFileResult, GetSyntaxTreeResult, PullActionsResult,
 };
 use biome_analyze::options::PreferredQuote;
-use biome_analyze::{AnalysisFilter, AnalyzerConfiguration, AnalyzerOptions, ControlFlow, Never};
+use biome_analyze::{
+    ActionFilter, AnalysisFilter, AnalyzerConfiguration, AnalyzerOptions, ControlFlow, Never,
+};
 use biome_configuration::css::{
     CssAllowWrongLineCommentsEnabled, CssAssistConfiguration, CssAssistEnabled,
     CssFormatterConfiguration, CssFormatterEnabled, CssLinterConfiguration, CssLinterEnabled,
@@ -537,6 +539,8 @@ fn lint(params: LintParams) -> LintResults {
             diagnostics: vec![],
             errors: 0,
             skipped_diagnostics: 0,
+            infos: 0,
+            warnings: 0,
         };
     };
 
@@ -607,6 +611,7 @@ pub(crate) fn code_actions(params: CodeActionsParams) -> PullActionsResult {
         categories,
         action_offset,
         document_services,
+        compute_actions,
     } = params;
     let tree = parse.tree();
     let Some(file_source) = language.to_css_file_source() else {
@@ -650,16 +655,34 @@ pub(crate) fn code_actions(params: CodeActionsParams) -> PullActionsResult {
         css_services,
         &plugins,
         |signal| {
-            actions.extend(signal.actions().into_code_action_iter().map(|item| {
-                CodeAction {
-                    category: item.category.clone(),
-                    rule_name: item
-                        .rule_name
-                        .map(|(group, name)| (Cow::Borrowed(group), Cow::Borrowed(name))),
-                    offset: action_offset,
-                    suggestion: item.suggestion,
-                }
-            }));
+            if compute_actions {
+                actions.extend(
+                    signal
+                        .actions(ActionFilter::all())
+                        .into_code_action_iter()
+                        .map(|item| CodeAction {
+                            category: item.category.clone(),
+                            rule_name: item
+                                .rule_name
+                                .map(|(group, name)| (Cow::Borrowed(group), Cow::Borrowed(name))),
+                            applicability: Some(item.suggestion.applicability),
+                            offset: action_offset,
+                            suggestion: Some(item.suggestion),
+                        }),
+                );
+            } else {
+                actions.extend(signal.actions_metadata().into_iter().map(|meta| {
+                    CodeAction {
+                        category: meta.category,
+                        rule_name: meta
+                            .rule_name
+                            .map(|(g, r)| (Cow::Borrowed(g), Cow::Borrowed(r))),
+                        applicability: Some(meta.applicability),
+                        suggestion: None,
+                        offset: action_offset,
+                    }
+                }));
+            }
 
             ControlFlow::<Never>::Continue(())
         },
@@ -713,16 +736,18 @@ pub(crate) fn fix_all(params: FixAllParams) -> Result<FixFileResult, WorkspaceEr
             file_source,
         };
 
-        let (action, _) = analyze(
+        let mut pending_actions = Vec::new();
+
+        let (_, _) = analyze(
             &tree,
             filter,
             &analyzer_options,
             css_services,
             &params.plugins,
-            |signal| process_fix_all.process_signal(signal),
+            |signal| process_fix_all.collect_signal(signal, &mut pending_actions),
         );
 
-        let result = process_fix_all.process_action(action, |root| {
+        let result = process_fix_all.process_batch_actions(pending_actions, |root| {
             tree = match AnyCssRoot::cast(root) {
                 Some(tree) => tree,
                 None => return None,

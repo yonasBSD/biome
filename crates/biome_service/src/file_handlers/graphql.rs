@@ -14,7 +14,9 @@ use crate::settings::{
     Settings, SettingsWithEditor, check_feature_activity, check_override_feature_activity,
 };
 use crate::workspace::{CodeAction, FixFileResult, GetSyntaxTreeResult, PullActionsResult};
-use biome_analyze::{AnalysisFilter, AnalyzerConfiguration, AnalyzerOptions, ControlFlow, Never};
+use biome_analyze::{
+    ActionFilter, AnalysisFilter, AnalyzerConfiguration, AnalyzerOptions, ControlFlow, Never,
+};
 use biome_configuration::graphql::{
     GraphqlAssistConfiguration, GraphqlAssistEnabled, GraphqlFormatterConfiguration,
     GraphqlFormatterEnabled, GraphqlLinterConfiguration, GraphqlLinterEnabled,
@@ -494,6 +496,7 @@ pub(crate) fn code_actions(params: CodeActionsParams) -> PullActionsResult {
         categories,
         action_offset,
         document_services: _,
+        compute_actions,
     } = params;
     let _ = debug_span!("Code actions GraphQL", range =? range, path =? path).entered();
     let tree = parse.tree();
@@ -530,16 +533,34 @@ pub(crate) fn code_actions(params: CodeActionsParams) -> PullActionsResult {
     info!("GraphQL runs the analyzer");
 
     analyze(&tree, filter, &analyzer_options, |signal| {
-        actions.extend(signal.actions().into_code_action_iter().map(|item| {
-            CodeAction {
-                category: item.category.clone(),
-                rule_name: item
-                    .rule_name
-                    .map(|(group, name)| (Cow::Borrowed(group), Cow::Borrowed(name))),
-                suggestion: item.suggestion,
-                offset: action_offset,
-            }
-        }));
+        if compute_actions {
+            actions.extend(
+                signal
+                    .actions(ActionFilter::all())
+                    .into_code_action_iter()
+                    .map(|item| CodeAction {
+                        category: item.category.clone(),
+                        rule_name: item
+                            .rule_name
+                            .map(|(group, name)| (Cow::Borrowed(group), Cow::Borrowed(name))),
+                        applicability: Some(item.suggestion.applicability),
+                        suggestion: Some(item.suggestion),
+                        offset: action_offset,
+                    }),
+            );
+        } else {
+            actions.extend(signal.actions_metadata().into_iter().map(|meta| {
+                CodeAction {
+                    category: meta.category,
+                    rule_name: meta
+                        .rule_name
+                        .map(|(g, r)| (Cow::Borrowed(g), Cow::Borrowed(r))),
+                    applicability: Some(meta.applicability),
+                    suggestion: None,
+                    offset: action_offset,
+                }
+            }));
+        }
 
         ControlFlow::<Never>::Continue(())
     });
@@ -583,11 +604,13 @@ pub(crate) fn fix_all(params: FixAllParams) -> Result<FixFileResult, WorkspaceEr
         tree.syntax().text_range_with_trivia().len().into(),
     );
     loop {
-        let (action, _) = analyze(&tree, filter, &analyzer_options, |signal| {
-            process_fix_all.process_signal(signal)
+        let mut pending_actions = Vec::new();
+
+        let (_, _) = analyze(&tree, filter, &analyzer_options, |signal| {
+            process_fix_all.collect_signal(signal, &mut pending_actions)
         });
 
-        let result = process_fix_all.process_action(action, |root| {
+        let result = process_fix_all.process_batch_actions(pending_actions, |root| {
             tree = match GraphqlRoot::cast(root) {
                 Some(tree) => tree,
                 None => return None,

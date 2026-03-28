@@ -23,6 +23,7 @@ use crate::{
     settings::{FormatSettings, LanguageListSettings, LanguageSettings, ServiceLanguage},
     workspace::{CodeAction, FixFileResult, GetSyntaxTreeResult, PullActionsResult, RenameResult},
 };
+use biome_analyze::ActionFilter;
 use biome_analyze::options::{PreferredIndentation, PreferredQuote};
 use biome_analyze::{
     AnalysisFilter, AnalyzerConfiguration, AnalyzerOptions, ControlFlow, Never, QueryMatch,
@@ -948,6 +949,8 @@ pub(crate) fn lint(params: LintParams) -> LintResults {
             errors: 0,
             diagnostics: Vec::new(),
             skipped_diagnostics: 0,
+            warnings: 0,
+            infos: 0,
         };
     };
     let tree = params.parse.tree();
@@ -1029,6 +1032,7 @@ pub(crate) fn code_actions(params: CodeActionsParams) -> PullActionsResult {
         categories,
         action_offset,
         document_services,
+        compute_actions,
     } = params;
     let _ = debug_span!("Code actions JavaScript", range =? range, path =? path).entered();
     let tree = parse.tree();
@@ -1071,17 +1075,37 @@ pub(crate) fn code_actions(params: CodeActionsParams) -> PullActionsResult {
         &plugins,
         services,
         |signal| {
-            actions.extend(signal.actions().into_code_action_iter().map(|item| {
-                debug!("Pulled action category {:?}", item.category);
-                CodeAction {
-                    category: item.category.clone(),
-                    rule_name: item
-                        .rule_name
-                        .map(|(group, name)| (Cow::Borrowed(group), Cow::Borrowed(name))),
-                    suggestion: item.suggestion,
-                    offset: action_offset,
-                }
-            }));
+            if compute_actions {
+                actions.extend(
+                    signal
+                        .actions(ActionFilter::all())
+                        .into_code_action_iter()
+                        .map(|item| {
+                            debug!("Pulled action category {:?}", item.category);
+                            CodeAction {
+                                category: item.category.clone(),
+                                rule_name: item.rule_name.map(|(group, name)| {
+                                    (Cow::Borrowed(group), Cow::Borrowed(name))
+                                }),
+                                applicability: Some(item.suggestion.applicability),
+                                suggestion: Some(item.suggestion),
+                                offset: action_offset,
+                            }
+                        }),
+                );
+            } else {
+                actions.extend(signal.actions_metadata().into_iter().map(|meta| {
+                    CodeAction {
+                        category: meta.category,
+                        rule_name: meta
+                            .rule_name
+                            .map(|(g, r)| (Cow::Borrowed(g), Cow::Borrowed(r))),
+                        applicability: Some(meta.applicability),
+                        suggestion: None,
+                        offset: action_offset,
+                    }
+                }));
+            }
 
             ControlFlow::<Never>::Continue(())
         },
@@ -1149,16 +1173,18 @@ pub(crate) fn fix_all(params: FixAllParams) -> Result<FixFileResult, WorkspaceEr
             services.set_embedded_value_references(value_refs.references)
         }
 
-        let (action, _) = analyze(
+        let mut pending_actions = Vec::new();
+
+        let (_, _) = analyze(
             &tree,
             filter,
             &analyzer_options,
             &params.plugins,
             services,
-            |signal| process_fix_all.process_signal(signal),
+            |signal| process_fix_all.collect_signal(signal, &mut pending_actions),
         );
 
-        let result = process_fix_all.process_action(action, |root| {
+        let result = process_fix_all.process_batch_actions(pending_actions, |root| {
             tree = match AnyJsRoot::cast(root) {
                 Some(tree) => tree,
                 None => return None,
