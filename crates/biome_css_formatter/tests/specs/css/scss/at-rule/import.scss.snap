@@ -1,5 +1,6 @@
 ---
 source: crates/biome_formatter_test/src/snapshot_builder.rs
+assertion_line: 240
 info: css/scss/at-rule/import.scss
 ---
 
@@ -7,6 +8,9 @@ info: css/scss/at-rule/import.scss
 
 ```scss
 @import"theme";
+
+@import "#{$file}.scss";
+@import "#{$file}.css"print;
 
 @import "rounded-corners",
 "text-shadow";
@@ -36,6 +40,9 @@ screen;
 
 ```scss
 @import "theme";
+
+@import "#{$file}.scss";
+@import "#{$file}.css" print;
 
 @import "rounded-corners", "text-shadow";
 
