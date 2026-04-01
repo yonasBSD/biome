@@ -56,7 +56,7 @@ use crate::syntax::thematic_break_block::parse_thematic_break_block;
 use crate::syntax::with_virtual_line_start;
 use crate::syntax::{
     INDENT_CODE_BLOCK_SPACES, MAX_BLOCK_PREFIX_INDENT, TAB_STOP_SPACES, at_block_interrupt,
-    at_indent_code_block, is_paragraph_like,
+    at_indent_code_block, is_paragraph_like, is_whitespace_only,
 };
 
 /// Tokens that start a new block (used for recovery)
@@ -203,10 +203,6 @@ fn emit_list_post_marker_space(p: &mut MarkdownParser) -> bool {
     } else {
         false
     }
-}
-
-fn is_whitespace_only(text: &str) -> bool {
-    !text.is_empty() && text.chars().all(|c| c == ' ' || c == '\t')
 }
 
 /// Check if the remaining content forms a thematic break pattern.
@@ -838,7 +834,11 @@ impl ParseNodeList for OrderedList {
     type Kind = MarkdownSyntaxKind;
     type Parser<'source> = MarkdownParser<'source>;
 
-    const LIST_KIND: Self::Kind = MD_BULLET_LIST; // Reuse bullet list node structure
+    // The Markdown grammar defines a single MdBulletList node kind for both
+    // bullet and ordered lists — the marker type distinguishes them, not the
+    // CST node kind. This keeps the grammar simpler and avoids duplicating
+    // the entire list/item node hierarchy.
+    const LIST_KIND: Self::Kind = MD_BULLET_LIST;
 
     fn parse_element(&mut self, p: &mut Self::Parser<'_>) -> ParsedSyntax {
         parse_list_element_common(
