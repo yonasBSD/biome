@@ -5,7 +5,7 @@ use biome_console::markup;
 use biome_diagnostics::Severity;
 use biome_js_syntax::{
     AnyJsxAttribute, AnyJsxAttributeName, AnyJsxAttributeValue, AnyJsxElementName, AnyJsxTag,
-    JsSyntaxKind, JsxAttribute,
+    JsFileSource, JsSyntaxKind, JsxAttribute,
 };
 use biome_rowan::{AstNode, WalkEvent};
 use biome_rule_options::no_label_without_control::NoLabelWithoutControlOptions;
@@ -283,6 +283,11 @@ fn has_for_attribute(jsx_tag: &AnyJsxTag) -> bool {
                 }
             })
             .is_some_and(|jsx_name| for_attributes.contains(&jsx_name.text_trimmed())),
+        AnyJsxAttribute::JsxShorthandAttribute(attribute) => attribute
+            .name()
+            .ok()
+            .and_then(|name| name.value_token().ok())
+            .is_some_and(|name| for_attributes.contains(&name.text_trimmed())),
         AnyJsxAttribute::JsxSpreadAttribute(_) | AnyJsxAttribute::JsMetavariable(_) => false,
     })
 }
