@@ -43,3 +43,7 @@ function nullable(flag: boolean): string | null { if (flag) return "yes"; return
 const satisfiesConst = (): string => ("idle" as const) satisfies string;
 
 function angleBracketConst(): string { return <const>"hello"; }
+
+function tupleWiden(): [string, number] { return ["hello", 42] as const; }
+
+function ternaryWiden(b: boolean): string { return b ? "a" : "b"; }

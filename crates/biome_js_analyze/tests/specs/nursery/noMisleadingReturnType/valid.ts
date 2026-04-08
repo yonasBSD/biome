@@ -96,3 +96,7 @@ function arrayAnnotation(): string[] { return ["a", "b"]; }
 function booleanExhaustive(b: boolean): boolean { if (b) return true; return false; }
 
 function anyReturn(): string { return JSON.parse("{}"); }
+
+function tupleNoConst(): [boolean, string] { return [true, "hello"]; }
+
+function ternaryExact(b: boolean): "a" | "b" { return b ? "a" : "b"; }
