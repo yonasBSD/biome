@@ -280,6 +280,7 @@ define_categories! {
     "lint/nursery/useQwikLoaderLocation": "https://biomejs.dev/linter/rules/use-qwik-loader-location",
     "lint/nursery/useQwikMethodUsage": "https://biomejs.dev/linter/rules/use-qwik-method-usage",
     "lint/nursery/useQwikValidLexicalScope": "https://biomejs.dev/linter/rules/use-qwik-valid-lexical-scope",
+    "lint/nursery/useReduceTypeParameter": "https://biomejs.dev/linter/rules/use-reduce-type-parameter",
     "lint/nursery/useRegexpExec": "https://biomejs.dev/linter/rules/use-regexp-exec",
     "lint/nursery/useRequiredScripts": "https://biomejs.dev/linter/rules/use-required-scripts",
     "lint/nursery/useScopedStyles": "https://biomejs.dev/linter/rules/use-scoped-styles",
