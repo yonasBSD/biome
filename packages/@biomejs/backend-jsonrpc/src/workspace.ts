@@ -2551,6 +2551,11 @@ See https://biomejs.dev/linter/rules/use-spread
 	 */
 	useSpread?: UseSpreadConfiguration;
 	/**
+	* Prefer String#startsWith() and String#endsWith() over verbose prefix and suffix checks.
+See https://biomejs.dev/linter/rules/use-string-starts-ends-with 
+	 */
+	useStringStartsEndsWith?: UseStringStartsEndsWithConfiguration;
+	/**
 	* Enforce the use of the u or v flag for regular expressions.
 See https://biomejs.dev/linter/rules/use-unicode-regex 
 	 */
@@ -4469,6 +4474,9 @@ export type UseSortedClassesConfiguration =
 export type UseSpreadConfiguration =
 	| RulePlainConfiguration
 	| RuleWithUseSpreadOptions;
+export type UseStringStartsEndsWithConfiguration =
+	| RulePlainConfiguration
+	| RuleWithUseStringStartsEndsWithOptions;
 export type UseUnicodeRegexConfiguration =
 	| RulePlainConfiguration
 	| RuleWithUseUnicodeRegexOptions;
@@ -6281,6 +6289,11 @@ export interface RuleWithUseSpreadOptions {
 	level: RulePlainConfiguration;
 	options?: UseSpreadOptions;
 }
+export interface RuleWithUseStringStartsEndsWithOptions {
+	fix?: FixKind;
+	level: RulePlainConfiguration;
+	options?: UseStringStartsEndsWithOptions;
+}
 export interface RuleWithUseUnicodeRegexOptions {
 	fix?: FixKind;
 	level: RulePlainConfiguration;
@@ -7877,6 +7890,7 @@ export interface UseSortedClassesOptions {
 	functions?: string[];
 }
 export type UseSpreadOptions = {};
+export type UseStringStartsEndsWithOptions = {};
 export type UseUnicodeRegexOptions = {};
 export interface UseVueConsistentDefinePropsDeclarationOptions {
 	style?: DeclarationStyle;
@@ -8879,6 +8893,7 @@ export type Category =
 	| "lint/nursery/useScopedStyles"
 	| "lint/nursery/useSortedClasses"
 	| "lint/nursery/useSpread"
+	| "lint/nursery/useStringStartsEndsWith"
 	| "lint/nursery/useUnicodeRegex"
 	| "lint/nursery/useUniqueArgumentNames"
 	| "lint/nursery/useUniqueFieldDefinitionNames"
