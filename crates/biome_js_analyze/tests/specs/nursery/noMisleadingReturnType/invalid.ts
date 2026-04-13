@@ -48,6 +48,8 @@ function tupleWiden(): [string, number] { return ["hello", 42] as const; }
 
 function ternaryWiden(b: boolean): string { return b ? "a" : "b"; }
 
+function readonlyWider(): Readonly<{name: string}> { return {name: "hello"} as const; }
+
 class StatusClass { getStatus(b: boolean): string { if (b) return "loading"; return "idle"; } }
 
 const modeObj = { getMode(b: boolean): string { if (b) return "dark"; return "light"; } };
