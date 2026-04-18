@@ -2298,6 +2298,11 @@ See https://biomejs.dev/linter/rules/no-proto
 	 */
 	noProto?: NoProtoConfiguration;
 	/**
+	* Disallow deep imports from the react-native package.
+See https://biomejs.dev/linter/rules/no-react-native-deep-imports 
+	 */
+	noReactNativeDeepImports?: NoReactNativeDeepImportsConfiguration;
+	/**
 	* Disallow color literals in React Native styles.
 See https://biomejs.dev/linter/rules/no-react-native-literal-colors 
 	 */
@@ -4370,6 +4375,9 @@ export type NoPlaywrightWaitForTimeoutConfiguration =
 export type NoProtoConfiguration =
 	| RulePlainConfiguration
 	| RuleWithNoProtoOptions;
+export type NoReactNativeDeepImportsConfiguration =
+	| RulePlainConfiguration
+	| RuleWithNoReactNativeDeepImportsOptions;
 export type NoReactNativeLiteralColorsConfiguration =
 	| RulePlainConfiguration
 	| RuleWithNoReactNativeLiteralColorsOptions;
@@ -6150,6 +6158,10 @@ export interface RuleWithNoProtoOptions {
 	level: RulePlainConfiguration;
 	options?: NoProtoOptions;
 }
+export interface RuleWithNoReactNativeDeepImportsOptions {
+	level: RulePlainConfiguration;
+	options?: NoReactNativeDeepImportsOptions;
+}
 export interface RuleWithNoReactNativeLiteralColorsOptions {
 	level: RulePlainConfiguration;
 	options?: NoReactNativeLiteralColorsOptions;
@@ -7781,6 +7793,7 @@ export type NoPlaywrightWaitForNavigationOptions = {};
 export type NoPlaywrightWaitForSelectorOptions = {};
 export type NoPlaywrightWaitForTimeoutOptions = {};
 export type NoProtoOptions = {};
+export type NoReactNativeDeepImportsOptions = {};
 export type NoReactNativeLiteralColorsOptions = {};
 export interface NoReactNativeRawTextOptions {
 	/**
@@ -8961,6 +8974,7 @@ export type Category =
 	| "lint/nursery/noPlaywrightWaitForTimeout"
 	| "lint/nursery/noProto"
 	| "lint/nursery/noReactNativeLiteralColors"
+	| "lint/nursery/noReactNativeDeepImports"
 	| "lint/nursery/noReactNativeRawText"
 	| "lint/nursery/noRedundantDefaultExport"
 	| "lint/nursery/noReturnAssign"
