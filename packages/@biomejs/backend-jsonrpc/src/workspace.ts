@@ -2373,6 +2373,11 @@ See https://biomejs.dev/linter/rules/no-unnecessary-conditions
 	 */
 	noUnnecessaryConditions?: NoUnnecessaryConditionsConfiguration;
 	/**
+	* Disallow unnecessary template expressions.
+See https://biomejs.dev/linter/rules/no-unnecessary-template-expression 
+	 */
+	noUnnecessaryTemplateExpression?: NoUnnecessaryTemplateExpressionConfiguration;
+	/**
 	* Disallow + operations with operands that are known to be unsafe.
 See https://biomejs.dev/linter/rules/no-unsafe-plus-operands 
 	 */
@@ -4425,6 +4430,9 @@ export type NoUnknownAttributeConfiguration =
 export type NoUnnecessaryConditionsConfiguration =
 	| RulePlainConfiguration
 	| RuleWithNoUnnecessaryConditionsOptions;
+export type NoUnnecessaryTemplateExpressionConfiguration =
+	| RulePlainConfiguration
+	| RuleWithNoUnnecessaryTemplateExpressionOptions;
 export type NoUnsafePlusOperandsConfiguration =
 	| RulePlainConfiguration
 	| RuleWithNoUnsafePlusOperandsOptions;
@@ -6226,6 +6234,11 @@ export interface RuleWithNoUnnecessaryConditionsOptions {
 	level: RulePlainConfiguration;
 	options?: NoUnnecessaryConditionsOptions;
 }
+export interface RuleWithNoUnnecessaryTemplateExpressionOptions {
+	fix?: FixKind;
+	level: RulePlainConfiguration;
+	options?: NoUnnecessaryTemplateExpressionOptions;
+}
 export interface RuleWithNoUnsafePlusOperandsOptions {
 	level: RulePlainConfiguration;
 	options?: NoUnsafePlusOperandsOptions;
@@ -7841,6 +7854,7 @@ export interface NoUnknownAttributeOptions {
 	ignore?: string[];
 }
 export type NoUnnecessaryConditionsOptions = {};
+export type NoUnnecessaryTemplateExpressionOptions = {};
 export type NoUnsafePlusOperandsOptions = {};
 export interface NoUntrustedLicensesOptions {
 	/**
@@ -9001,6 +9015,7 @@ export type Category =
 	| "lint/nursery/noUndeclaredEnvVars"
 	| "lint/nursery/noUnknownAttribute"
 	| "lint/nursery/noUnnecessaryConditions"
+	| "lint/nursery/noUnnecessaryTemplateExpression"
 	| "lint/nursery/noUnsafePlusOperands"
 	| "lint/nursery/noUntrustedLicenses"
 	| "lint/nursery/noUnwantedPolyfillio"
