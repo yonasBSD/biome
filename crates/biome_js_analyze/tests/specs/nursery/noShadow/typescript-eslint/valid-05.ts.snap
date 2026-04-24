@@ -1,10 +1,11 @@
 ---
 source: crates/biome_js_analyze/tests/spec_tests.rs
-expression: valid.jsx
+expression: invalid-06.ts
 ---
 # Input
-```jsx
+```ts
 /* should not generate diagnostics */
-<label><span>A label<CustomInput /></span></label>;
+const test = 1;
+type Fn = (test: string) => typeof test;
 
 ```
